@@ -1,0 +1,262 @@
+
+\section{PRF/VRF}
+\subsubsection{Dodis-Yampolskiy PRF Standard Version} 
+$s \in \Z_p$ is the secret key, $pk = [s]_1$ is the $\G_1 $ point. $x$ is the PRF input.
+\[\prover_s(x) \rightarrow y = e(g,[x+s]^{-1}), \vk = [x + s]^{-1}\]
+\[\verifier(x,y,\vk): e(x\cdot pk, \vk) = e(g,g)  \quad \text{ and } \quad y = e(g,\vk)\]
+\[ = e([x + s], [x + s]^{-1}) = e(g,g) \quad \text{ and } \quad e(g,[x+s]^{-1}) = e(g,[x + s]^{-1})\]
+Explanation: the verifier has $x, y, \vk, pk$ and computes $e(pk \cdot x, \vk) = e(g,g)$, if correct, the $\vk$ given correctly verifies the $pk$ and $x$. The second pairing $y = e(g,\vk)$ verifies the prover has not modified $y$ or $\vk$ to pass the first pairing check.
+
+\subsubsection{Dodis-Yampolskiy PRF Private Version} 
+$\nullif = \PRF_s(\sn) = [\secret + \sn]_h^{-1}$ where h $\getsr$ $\G_1$ is a fixed $\G_1$ public parameter and $(\tilde{h}, \tilde{w} \getsr \G_2^2)$ are fixed $\G_2$ public parameters for the $\PRF$, $t$ is a secret PRF randomizing factor $\in \Z_p$.
+\[
+    \begin{aligned}
+    e(\nullif, \vk) &\stackrel{?}{=} e(\nullif, [s + sn]_{\tilde{h}} \cdot [t]_{\tilde{w}}) \\[5pt]
+    &= e(\nullif, [s + sn]_{\tilde{h}}) \cdot e(\nullif, [t]_{\tilde{w}}) \\[5pt]
+    &= e([s + sn]_{\tilde{h}}^{-1}, [s + sn]_{\tilde{h}}) \cdot y \stackrel{?}{=} e(h, \tilde{h}) \cdot y\\[2pt]
+\end{aligned}
+\]
+Soundness:
+\[\nullif = [s + sn]_h^{-1}\]
+\[\vk = [s + sn]_{\tilde{h}}\cdot [t]_{\tilde{w}} \]
+\[ y = e(\nullif, \tilde{w})^t \]
+Verification, assuming correctness of $\vk$ and $y$:
+\[
+    \begin{aligned}
+    e(\nullif, \vk) &\stackrel{?}{=} e(h,\tilde{h}) \cdot y \Leftrightarrow \\
+    e(\nullif, [s + \sn]_{\tilde{h}}\cdot [t]_{\tilde{w}} ) &= e(h,\tilde{h}) \cdot e(\nullif, \tilde{w})^t \Leftrightarrow \\
+    e(\nullif, [s + \sn]_{\tilde{h}}) \cdot e(\nullif,[t]_{\tilde{w}}) &= e(h,\tilde{h}) \cdot e(\nullif, \tilde{w})^t \\
+\end{aligned}
+\]
+Soundness: we can show, when $s \neq \sn$, $\nullif = [s+\sn]_h$. Assume $\nullif = [a]_h$ for some $a \in \Z_p$, then 
+\[
+    \begin{aligned}
+    e([a]_h, [s + \sn]_{\tilde{h}}) \cdot e([a]_h,[t]_{\tilde{w}}) &= e(h,\tilde{h}) \cdot e([a]_h, \tilde{w})^t \Leftrightarrow\\
+    e([a]_h, [s + \sn]_{\tilde{h}}) \cdot e([a]_h,[t]_{\tilde{w}}) &= e(h,\tilde{h}) \cdot e([a]_h,[t]_{\tilde{w}}) \Leftrightarrow\\
+    e([a]_h, [s + \sn]_{\tilde{h}})) &= e(h,\tilde{h}) \Leftrightarrow\\
+    a(s + \sn) = 1\\
+    a = 1/(s + \sn)
+\end{aligned}
+\]
+
+Zero-knowledge. "there exists a simulator that given any $\nullif \in \G_1$ can simulate a proof as
+\begin{itemize}
+    \item Pick random $\vk \in \G_2$
+    \item Let $y = e(\nullif, \vk) / e(h,\tilde{h}) \in \Gt$
+    \item Simulate a $\sum$-protocol proof that argues correctness of $\vk$ and $y$
+\end{itemize}
+
+\newpage
+
+$\ccm$ = coin commitment \\
+$\pid$ = user key \\
+$\sn$ = coin serial number \\
+$r$ = ccm commitment randomness \\
+$\rcm$ = registration credential commitment, commitment to $\pid$ and $\PRF$ key $\secret$ \\
+$\secret$ = PRF key \\
+$a$ = commitment randomness \\
+$\nullif$ \\
+$\vcm$ = value commitment \\
+$z$ randomness in value commitment\\
+$v$ = value of coin in commitment
+
+\noindent The goal is to prove the correctness of $\nullif$ and $\vcm$ by proving in zero-knowledge the relation 
+\[ \Rr(\ccm, \rcm, \nullif, \vcm, \pid, \sn, v, r, s, a, z ) \text{ holds:}\] 
+\begin{equation}
+\left(
+    \begin{aligned}
+        \ccm &= \commitment([ \pid, \sn, v]; r) \quad & \wedge \quad \\[2pt]
+        \rcm &= \commitment([ \pid, \secret]; a) \quad & \wedge \quad \\[2pt]
+        \nullif &= \PRF_s(\sn) \qquad & \wedge \quad \\[2pt]
+        \vcm &= \commitment([0,0,v]; z)
+    \end{aligned}
+\right)
+\end{equation}
+
+In different notation:
+
+\subsubsection{$\Rr_{split}, \pi^{split}$}s
+We want to prove this relation and generate the proof because this proves the correctness of $\nullif$ in $\ZK$ as part of the $\Rr_{split}$ relation.
+Split refers to the user splitting coins to spend them which I don't need to worry about, but the key thing here is proving $\nullif$ and the relation.
+\begin{equation*}
+ \text{ZK-PoK}\left\{
+    \begin{aligned}
+        (\ccm, & \rcm, \nullif, \vcm, \pid, \sn, v, r, s, a, z ) : \\[2pt]
+        \ccm &= \commitment([ \pid, \sn, v]; r) \quad & \wedge \quad \\[2pt]
+        \rcm &= \commitment([ \pid, \secret]; a) \quad & \wedge \quad \\[2pt]
+        \nullif &= \PRF_s(\sn) \qquad & \wedge \quad \\[2pt]
+        \vcm &= \commitment([0,0,v]; z) \qquad & \wedge \quad \\[2pt]
+    \end{aligned}
+\right\}
+\end{equation*}
+
+\noindent To prove the above holds in zero knowledge, rather than proving $\Rr_{split}$ directly, we prove a new relation $\Rr^*_{split}$, generate $\pi^*_{split}$, which no longer directly argues $\nullif$ but includes $\vk, y$
+
+\subsubsection{$\Rr^*_{split}, \pi^{*split}$}
+\begin{equation*}
+ \text{ZK-PoK}\left\{
+    \begin{aligned}
+        (\ccm, & \rcm, \nullif, \vcm, \pid, \sn, v, r, s, a, z, \vk, y, t ) : \\[2pt]
+        \ccm &= \commitment([ \pid, \sn, v]; r)  \textcolor{red}{= g_1^{\pid}g_2^{\sn}g_3^vg^r} \quad & \wedge \quad \\[2pt]
+        \rcm &= \commitment([ \pid, \secret]; a) \textcolor{red}{=g_1^{\pid}g_5^sg^a} \quad & \wedge \quad \\[2pt]
+        &\textcolor{red}{\cancel{\nullif = \PRF_s(\sn)}} \qquad & \wedge \quad \\[2pt]
+        \textcolor{red}{\vk} &= \textcolor{red}{[s + sn]_{\tilde{h}}\cdot [t]_{\tilde{w}}} \qquad & \wedge \quad \\[2pt]
+        \textcolor{red}{y} &= \textcolor{red}{e(\nullif, \tilde{w})^t} \qquad & \wedge \quad \\[2pt]
+        \vcm &= \commitment([0,0,v]; z) \textcolor{red}{=g_3^vg^z} \qquad & \wedge \quad \\[2pt]
+    \end{aligned}
+\right\}
+\end{equation*}
+
+\noindent Verification: the verifier has $(\nullif, \vk, y)$ and first verifies the correctness of the $\PRF$ with the pairing, then the $\sum$-protocols.
+
+\paragraph{Correctness of $\PRF$ given $(\nullif, \vk, y)$}
+Recall $\nullif = [s + sn]_h^{-1}, \vk = [s + sn]_{\tilde{h}}\cdot [t]_{\tilde{w}}, y = e(\nullif, \tilde{w})^t $
+\Note{explain the below, why it works}
+\[
+    \begin{aligned}
+    e(\nullif, \vk) &\stackrel{?}{=} e(\nullif, [s + sn]_{\tilde{h}} \cdot [t]_{\tilde{w}}) \\[5pt]
+    &= e(\nullif, [s + sn]_{\tilde{h}}) \cdot e(\nullif, [t]_{\tilde{w}}) \\[5pt]
+    &= e([s + sn]_{\tilde{h}}^{-1}, [s + sn]_{\tilde{h}}) \cdot y \stackrel{?}{=} e(h, \tilde{h}) \cdot y\\[2pt]
+    &\text{we have just proved that} \\
+    e(\nullif, \vk) &= e(h, \tilde{h}) \cdot y\\[5pt]
+    &\text{that's why we need y, to prove the randomness t} \\
+\end{aligned}
+\]
+
+How can we prove this part of the identity
+Commitment is message + randomness
+The message part can be cancelled with each other
+All that's left is the randomness
+The randomness is still the original randomness (because it's with y)
+The nullified contains other pure message
+
+
+\noindent Sigma protocol \\
+\begin{enumerate}
+    \item for $\ccm$ prove opening of the commitment $\pid$ $\ZKSoK(\pid)$ 
+    \item for $\rcm$ prove opening of the commitment $\pid$ $\ZKSoK(\pid)$
+    \item prove equality of $\pid$ in $\ccm$ and $\rcm$
+    \item extract $s + \sn$ to a new commitment $\cm = g$
+    \item prove $\sn$ in $\ccm$ is in $\vk$ and prove $s$ from $\rcm$ is in $\vk$
+    \item prove that the pairing equation worked? 
+    \item prove t
+\end{enumerate}
+
+\begin{equation*}
+    \begin{aligned}
+        \ccm &= g_1^{\pid}g_2^{\sn}g^r \quad & \wedge \quad \\[2pt]
+        \rcm &= g_1^{\pid}g_3^sg^a \quad & \wedge \quad \\[2pt]
+        \cm &= g_1^{\pid}g_3^sg^a \quad & \wedge \quad \\[2pt]
+        \ccm(g_1^{\pid}) &= \rcm(g_1^{\pid})
+    \end{aligned}
+\end{equation*}
+
+\pcb{
+\textbf{ Alice} \< \< \textbf{ Bob}  \\[0.1\baselineskip][\hline]
+ \<\< \\[-0.5\baselineskip]
+ \pid, \sn, s \in \ZZ_q \<\< \\
+ r, a \gets \ZZ_q^2\<\< \\
+ t_1,\dots, t_5 \gets \ZZ_q^5\<\< \\
+ T_1 = g_1^{t_1}g_2^{t_2}g^{t_3} \<\< \\
+ T_2 = g_1^{t_1}g_4^{t_4}g^{t_5} \< \sendmessageright*{\ccm, \rcm, T_1, T_2} \< \\
+ \< \sendmessageleft*{e} \< e \sample \ZZ\\
+    z_1 = t_1 + e \cdot \pid  \<\< \\
+    z_2 = t_2 + e \cdot \sn  \<\< \\
+    z_3 = t_3 + e \cdot r  \<\< \\
+    z_4 = t_4 + e \cdot s  \<\< \\
+    z_5 = t_5 + e \cdot a  \<\< \\
+ \< \sendmessageright*{z_1, \dots, z_5} \< \\
+ \<\< g_1^{z_1}g_2^{z_2}g^{z_3} \stackrel{?}{=} (\ccm)^e \cdot T_1\\
+ \<\< g_1^{z_1}g_4^{z_4}g^{z_5} \stackrel{?}{=} (\ccm)^e \cdot T_2\\
+}
+
+Completeness: 
+\begin{equation}
+    \begin{aligned}
+        g_1^{z_1}g_2^{z_2}g^{z_3} \stackrel{?}{=}& (\ccm)^e \cdot T_1\\
+        g_1^{t_1 + e \cdot \pid}g_2^{t_2 + e \cdot \sn}g^{t_3 + e \cdot r} {=}& (g_1^{\pid}g_2^{\sn}g^r)^e \cdot g_1^{t_1}g_2^{t_2}g^{t_3}\\
+        g_1^{t_1 + e \cdot \pid}g_2^{t_2 + e \cdot \sn}g^{t_3 + e \cdot r} {=}& g_1^{\pid \cdot e}g_2^{\sn \cdot e}g^{r\cdot e} \cdot g_1^{t_1}g_2^{t_2}g^{t_3}\\
+        g_1^{t_1 + e \cdot \pid}g_2^{t_2 + e \cdot \sn}g^{t_3 + e \cdot r} {=}& g_1^{t_1 + e \cdot \pid}g_2^{t_2 + e \cdot \sn}g^{t_3 + e \cdot r}\\
+    \end{aligned}
+\end{equation}
+
+\begin{equation}
+    \begin{aligned}
+        g_1^{z_1}g_4^{z_4}g^{z_5} \stackrel{?}{=}& (\rcm)^e \cdot T_2 \\
+        g_1^{t_1 + e \cdot \pid}g_4^{t_4 + e \cdot s}g^{t_5 + e \cdot a} =& (g_1^{\pid}g_3^sg^a)^e \cdot g_1^{t_1}g_4^{t_4}g^{t_5}\\
+        g_1^{t_1 + e \cdot \pid}g_4^{t_4 + e \cdot s}g^{t_5 + e \cdot a} =& g_1^{\pid \cdot e}g_3^{s \cdot e}g^{a \cdot e} \cdot g_1^{t_1}g_4^{t_4}g^{t_5}\\
+        g_1^{t_1 + e \cdot \pid}g_4^{t_4 + e \cdot s}g^{t_5 + e \cdot a} =& g_1^{t_1 + e \cdot \pid}g_4^{t_4 + e \cdot s}g^{t_5 + e \cdot a}\\
+    \end{aligned}
+\end{equation}
+Because the proof $z_1$ contains $\pid$ and is used in both $\ccm$ and $\rcm$ we can tell with high probability that $\pid$ is consistent.
+
+To ensure txn non-malleability, only Alice who knows the PRF key $s_A$ associated with $\pid_A$ should be able to spend coins. An adversary should not be able to $maul$ Alice's txn to change recipients or amounts. We ensure this by using a \textit{zero-knowledge signature of knowledge (ZKSoK)}, rather than $ZKAoK$ As a result, each input's splitproof $\pi^{*split}_i$ implicitly signs all the outputs which proves Alice is authorized to spend the input coin and prevents txn $mauling$. The signing key can be thought of as Alice's $\PRF$ key $s_A$ and all other secrets in the relation $\Rr_{split}$ which only she knows.
+
+Notation
+When proving a relation $\Rr_{rel}(\zkx; \zkw)$ holds, we use $\ZKProve_{rel}(\zkx; \zkw)$ and $\ZKVerify_{rel}(\zkx)$ as notation.
+
+\section{ZKP}
+% https://claude.ai/chat/da807505-abbb-4e01-afde-a2d977e652ce
+\[\Lang = \left\{((U, V, U', V'),(\alpha)) : V = U^{\alpha} \wedge V' = U'^{\alpha} \right\} \subseteq G^2 \times (G')^2 \times \Z_q\]
+
+\[\Lang = \left\{((\text{Instance of the problem}),(\text{Witness})) : \Rr \right\} \subseteq G^2 \times (G')^2 \times \Z_q\]
+
+\noindent A relation $\Rr$ is a set of pairs $(x,w)$ that satisfy a relationship. E.g. the relationship $\Rr_{squared}$ = $\{((x),w : x=w^2)\}$ consists of all pairs $(x,w)$ where $x$ is the square of $w$. The language $\Lang_{squared}$ is defined as $\Lang_{squared} = \{x  : \exists w \text{ such that }(x,w) \in \Rr_{squared} \}$
+$\Lang$ includes all instances $x$ where there exists a witness $w$ such that $(x,w)$ satisfies the relation $\Rr$
+
+
+\noindent A language $\Lang$ of relations $\Rr$ i.e. $\Lang(\Rr)$ is a set of tuples $(x,w)$ where $x$ is a public input and $w$ is a witness (a private input) such that a certain relation $\Rr$ between $x$ and $w$ holds. In this case, the $(U, V, U', V')$ are the public parameters, $\alpha$ is the witness. $\Lang$ consists of all tuples $((U, V, U', V'),\alpha)$ where the relation $V = U^{\alpha}, V'=U'^{\alpha}$ holds.
+
+\noindent Prover's Relation: The prover has a witness $\alpha \in \Z_q$ and secret randomness $r \getsr \Z_q$. Prover's relation is defined by $\Rr := (U^r, (U')^r) \in G \times G' $ 
+
+\subsubsection{Sigma Proofs}
+
+The simulator is an algorithm like a prover, but unlike a prover who knows the secret to convince the verifier, the simulator knows no secret. The simulator must fool a Verifier into believing their statement is true while generating a transcript indistinguishable from a Prover.
+
+Because a Simulator has no knowledge but can convince a verifier with an indistinguishable transcript, then every transcript must be indistinguishable and cannot tell the difference between the Prover and the Simulator.
+
+\paragraph{Proving knowledge of a discrete logarithm}
+Also known as the Schnorr signature, 
+
+\pcb{
+\textbf{ Alice} \< \< \textbf{ Bob}  \\[0.1\baselineskip][\hline]
+ \<\< \\[-0.5\baselineskip]
+ sk \in \ZZ_q, \pk := g^{\sk}\<\< \\
+ s \gets \ZZ_q, T := g^s\<\< \\
+ \< \sendmessageright*{\pk, T} \< \\
+ \<\< e \sample \ZZ \\
+ \< \sendmessageleft*{e} \< \\
+z = s + e\cdot\sk \<\< \\
+ \< \sendmessageright*{z} \< \\
+ \<\< g^{z} \stackrel{?}{=} (\pk)^e \cdot T\\
+}
+
+Completeness: 
+\begin{equation}
+    \begin{aligned}
+        g^{z} \stackrel{?}{=}& (\pk)^e \cdot T\\
+        g^{s + e\cdot\sk} {=}& (g^{\sk})^e \cdot g^s\\
+        g^{s + e\cdot\sk} {=}& g^{s + e\cdot\sk}\\
+    \end{aligned}
+\end{equation}
+
+\Note{prove soundness and zero knowledgeness for each}
+Soundness: to prove soundness, we show a knowledge extractor exists for "every possible prover". We show that by rewinding the prover's protocol, it allows the knowledge extractor to extract the secret key.
+
+\paragraph{Proving knowledge of the opening of a pedersen commitment}
+
+\pcb{
+\textbf{ Alice} \< \< \textbf{ Bob}  \\[0.1\baselineskip][\hline]
+ \<\< \\[-0.5\baselineskip]
+ m \in \ZZ_q, r \gets \ZZ_q \< \< \\
+ \commitment := g^mh^r \<\< \\
+ s_1, s_2 \gets \ZZ_q^2 \<\< \\
+ T := g^{s_1}h^{s_2}\<\< \\
+ \< \sendmessageright*{\GG,q,g,h,\commitment, T} \< \\
+ \<\< e \sample \ZZ \\
+ \< \sendmessageleft*{e} \< \\
+z_1 = s_1 + em \<\< \\
+z_2 = s_2 + er \<\< \\
+ \< \sendmessageright*{z_1, z_2} \< \\
+ \<\< g^{z_1}h^{z_2} \stackrel{?}{=} (\commitment)^e \cdot T\\
+}
