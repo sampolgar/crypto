@@ -1,11 +1,44 @@
-A probability ensemble is not a single random variable, but rather a collection or family of random variables.
-In this definition, X = {X(a,n)} represents the entire ensemble. Each X(a,n) is an individual random variable within this collection.
-The indexing works like this:
+\section*{Preliminaries and notation}
+\begin{itemize}
+    \item $S \subseteq \zo^*$ defines set $S$ as a finite subset of $\zo$ all finite-length strings. 
+    \item $x \in_R S$, $R$ indicates x is chosen randomly / uniformly from $S$
+    \item $U_n$ x is chosen from the set of all n-bit strings
+    \item $\mu(\cdot)$ means the negligible function can take any input. Negligible functions decrease faster than inverse polynomial as $n$ increases
+    \item must use positive polynomial, if not, maybe it won't be negligible. We want $\mu(n) < \frac{1}{p(n)}$
+    \item $\lambda$ is an empty string
+\end{itemize}
 
-'a' is from the set {0,1}* (meaning all finite binary strings)
-'n' is from the set N (natural numbers)
 
+$$
+X = \{X(a,n)\}_{a\in\zo^*; n \in \mathbb{N}}
+$$
 
-So for each combination of 'a' (a binary string) and 'n' (a natural number), there is a corresponding random variable X(a,n).
-It's not quite correct to say X = a(n). Instead, X(a,n) represents a specific random variable in the ensemble for particular values of a and n.
-The ensemble being "infinite" means there are infinitely many such random variables in the collection, as there are infinitely many possible combinations of 'a' and 'n'.`'
+"A probability ensemble" is a collection or family of random variables, denoted by $X = \{X(a,n)\}$ i.e. $X$ represents the set of $\{X(a,n)\}$. 
+\begin{itemize}
+    \item Set $X = \{X(a,n)\}$ defines the set of random variables $X$
+    \item Set Subscript ${a\in\zo^*; n \in \mathbb{N}}$ defines the indexing, that is, exactly what values of $a, n$ can take for infinitely any element in set $X$. e.g. $X('01', 3)$ is the index of a random variable $X$ where $a$ is a binary string of any finite length "0, 1, 01, 000", $n$ is a natural number 1,2
+    \item $\zo^*$ is the Kleene star operation, means all finite strings, an infinite set because there's no limit to the length
+    \item $n\in\Nat$ means $n$ can be any natural number, also an infinite set
+    \item indexing gives us an address or a way to talk about 1 specific random variable rather than the collection
+    \item "probability ensemble" is a term in cryptography / probability theory referring to a collection or family of probability distributions or random variables. Used to describe systems where behaviours depend on on input length, security parameter, etc
+    \item "ensemble" means we're dealing with a collection of probabilistic objects rather than a single fixed distribution
+\end{itemize}
+
+$$
+\abs{
+    \Pr\[D(X(a,n)) = 1 \] - \Pr\[D(Y(a,n))=1\]
+} \leq \mu(n)
+$$
+
+The (absolute difference) of the probability that the distinguisher $D$ outputs 1 when given a sample from $X(a,n)$ and the probability $D$ outputs 1 when given a sample from $Y(a,n)$ is $\leq$ the negl. function $\mu(\cdot)$ 
+
+Notes:
+\begin{itemize}
+    \item $D$ is a $\ppt$ algorithm trying to distinguish between samples from $X$ and $Y$, not guessing the bit
+    \item $D's$ output is binary $\zo$. Output 1 means "The sample came from $X$" or "This is a real sample" i.e. distinguish
+    \item We look at the difference in probability of $D$ outputting 1 for $X$ vs $Y$
+    \item a negl. difference means $D$ can't distinguish
+    \item absolute value || means we only want the magnitude of the difference, doesn't matter which is larger
+    \item $\mu(n)$ being a negl. function means the difference becomes smaller as the security parameter grows larger
+\end{itemize}
+
