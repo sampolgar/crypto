@@ -8,7 +8,32 @@
     \item $\lambda$ is an empty string
 \end{itemize}
 
+\subsection*{Polynomial time, Security parameter}
+\begin{itemize}
+    \item Polynomial time refers to the computational complexity of an algorithm with respect to the security parameter
+    \item it means the protocol is efficient and practical because algorithms are feasible in polynomial time
+    \item But also secure because breaking the algorithm is infeasible
+    \item security parameter determines level of security e.g. length of keys in bits
+    \item an algorithm running in polynomial time in the security parameter can be expressed as a polynomial function of the security parameter. That is, there exists $ p(\lambda)$ such that $\mathcal{O}(p(\lambda))$
+    \item E.g. if $\lambda$ = 128 bits runs in polynomial time, running time will be a function of $\lambda$ like $\mathcal{O}\lambda^2$
+    \item In contrast to exponential time which are $\mathcal{O}2^{\lambda}$
+\end{itemize}
 
+\subsection*{Theory of Computation}
+\begin{itemize}
+    \item a turing machine is a theoretical device that "manipulates symbols on a strip of tape according to a table of rules" simulating algorithm logic
+    \item Includes an infinitely long tape divided into blocks, a head can read and write symbols on the tape, a state register storing the machine state, a finite table of instructions
+    \item We use unary $1^n$, a string of 1's on the security paramter tape for reasons:
+    \begin{itemize}
+        \item Unary: $1^n$ provides unary representation of $n$ meaning input length corresponds with $n$, the longest possible representation (Worst case and Lower bound)
+        \item in binary, $n$ is represented in $log_2(n)$ bits. e.g. 1000 is 11111101000 = 10 bits long. In unary, $1^{1000}$ is a string of 1000 ones.
+        \item using binary, an algorithm taking time proportional to input length would run in $\mathcal{O}(log(n))$ which runs in $\mathcal{O}(n)$
+    \end{itemize}
+    \item Security parameter tape is used to model how a system scales with security parameter, $1^{\lambda}$ is written on it e.g. string of 1's
+    \item This means, the function is bounded by the length of the input on the security parameter tape
+\end{itemize}
+
+\section*{Computational Indistinguishability}
 $$
 X = \{X(a,n)\}_{a\in\zo^*; n \in \mathbb{N}}
 $$
@@ -24,6 +49,7 @@ $$
     \item "ensemble" means we're dealing with a collection of probabilistic objects rather than a single fixed distribution
 \end{itemize}
 
+Two probability ensembles, $X, Y$ are computationally indistinguishabile: $X \stackrel{c}{\equiv} Y$ if
 $$
 \abs{
     \Pr\[D(X(a,n)) = 1 \] - \Pr\[D(Y(a,n))=1\]
@@ -40,5 +66,16 @@ Notes:
     \item a negl. difference means $D$ can't distinguish
     \item absolute value || means we only want the magnitude of the difference, doesn't matter which is larger
     \item $\mu(n)$ being a negl. function means the difference becomes smaller as the security parameter grows larger
+    \item All parties run in polynomial time in the security parameter means 
 \end{itemize}
 
+\subsubsection*{Non-uniformity}
+"Above notion of computational indistinguishability is inherently non uniform: 
+"We allow D to be non-uniform": 
+
+\subsubsection*{Order of quantifiers for computational indistinguishability}
+
+
+Questions
+- What are the tapes that are referred to?
+- How does the definition claim uniformity? Something to do with D Ding the random variabnles based on the indexed input
