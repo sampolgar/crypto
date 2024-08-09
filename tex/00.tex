@@ -19,6 +19,21 @@
     \item In contrast to exponential time which are $\mathcal{O}2^{\lambda}$
 \end{itemize}
 
+\subsection*{Theory of Computation}
+\begin{itemize}
+    \item a turing machine is a theoretical device that "manipulates symbols on a strip of tape according to a table of rules" simulating algorithm logic
+    \item Includes an infinitely long tape divided into blocks, a head can read and write symbols on the tape, a state register storing the machine state, a finite table of instructions
+    \item We use unary $1^n$, a string of 1's on the security paramter tape for reasons:
+    \begin{itemize}
+        \item Unary: $1^n$ provides unary representation of $n$ meaning input length corresponds with $n$, the longest possible representation (Worst case and Lower bound)
+        \item in binary, $n$ is represented in $log_2(n)$ bits. e.g. 1000 is 11111101000 = 10 bits long. In unary, $1^{1000}$ is a string of 1000 ones.
+        \item using binary, an algorithm taking time proportional to input length would run in $\mathcal{O}(log(n))$ which runs in $\mathcal{O}(n)$
+    \end{itemize}
+    \item Security parameter tape is used to model how a system scales with security parameter, $1^{\lambda}$ is written on it e.g. string of 1's
+    \item This means, the function is bounded by the length of the input on the security parameter tape
+    \item Advice Tape: is used in non-uniform computation, it's additional information given to an algorithm 
+\end{itemize}
+
 
 \subsubsection*{Uniform, Non-Uniform}
 Non uniform algorithms aren't non-uniform randomness! 
@@ -56,19 +71,7 @@ Answer and Discussion
 \end{enumerate}
 log/exp rule: $x^{\log_a^{(y)}} = y^{\log_a^{(x)}}$
 
-\subsection*{Theory of Computation}
-\begin{itemize}
-    \item a turing machine is a theoretical device that "manipulates symbols on a strip of tape according to a table of rules" simulating algorithm logic
-    \item Includes an infinitely long tape divided into blocks, a head can read and write symbols on the tape, a state register storing the machine state, a finite table of instructions
-    \item We use unary $1^n$, a string of 1's on the security paramter tape for reasons:
-    \begin{itemize}
-        \item Unary: $1^n$ provides unary representation of $n$ meaning input length corresponds with $n$, the longest possible representation (Worst case and Lower bound)
-        \item in binary, $n$ is represented in $log_2(n)$ bits. e.g. 1000 is 11111101000 = 10 bits long. In unary, $1^{1000}$ is a string of 1000 ones.
-        \item using binary, an algorithm taking time proportional to input length would run in $\mathcal{O}(log(n))$ which runs in $\mathcal{O}(n)$
-    \end{itemize}
-    \item Security parameter tape is used to model how a system scales with security parameter, $1^{\lambda}$ is written on it e.g. string of 1's
-    \item This means, the function is bounded by the length of the input on the security parameter tape
-\end{itemize}
+
 
 
 
@@ -91,7 +94,7 @@ $$
 
 \begin{itemize}
     \item $n$ is input length, the security parameter
-    \item $a$ is an auxillary input drawn from a binary string of any length, could be public parameters
+    \item $a$ a binary string of any length, could be public parameters
     \item ensembles $X, Y$ are computationally indistinguishable if no polynomial time algorithm $D$ can tell them apart with greater than negligible advantage.
     \item $D$ is a $\ppt$ algorithm trying to distinguish between samples from $X$ and $Y$, not guessing the bit
     \item $D's$ output is binary $\zo$. Output 1 means a successful distinguish
@@ -116,7 +119,10 @@ $$
 \subsubsection*{Non-uniformity}
 \begin{itemize}
     \item $D$ is defined above as non-uniform which increases its power to distinguish
-    \item Why it's important for computational Indistinguishability to be non-uniform? 
+    \item basically says the concept of computational indistinguishability is non-uniform. Even if we start with uniform ensembles of $X, Y$, the distinguisher that potentially breaks indistinguishability might be non-uniform
+    \item Non-uniformity comes from the fact that for different input length $n$, there may be different aux input $a$ that allows a distinguisher to win
+    \item The value $a$ is a public parameter that needs to be "written on the advice tape of the reduction algorithm
+    \item This means securtity proofs and analysis need to consider non-uniform adversaries 
 \end{itemize}
 
 \subsubsection*{Order of quantifiers for computational indistinguishability}
