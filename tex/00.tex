@@ -8,7 +8,7 @@
     \item $\lambda$ is an empty string
 \end{itemize}
 
-\subsection*{Polynomial time, Security parameter}
+\subsubsection*{Polynomial time, Security parameter}
 \begin{itemize}
     \item Polynomial time refers to the computational complexity of an algorithm with respect to the security parameter
     \item it means the protocol is efficient and practical because algorithms are feasible in polynomial time
@@ -18,6 +18,43 @@
     \item E.g. if $\lambda$ = 128 bits runs in polynomial time, running time will be a function of $\lambda$ like $\mathcal{O}\lambda^2$
     \item In contrast to exponential time which are $\mathcal{O}2^{\lambda}$
 \end{itemize}
+
+
+\subsubsection*{Uniform, Non-Uniform}
+Non uniform algorithms aren't non-uniform randomness! 
+Uniform algorithms don't change procedure based on the input size. Non-uniform algorithms can have logic based around the input size.
+Uniform algorithms have a fixed strategy, non-uniform can adapt. 
+The non-uniformity is not about randomness but the potential for the algorithm to have different strategies for input lengths.
+Allowing a distinguisher algorithm $D$ to be non-uniform means it's a powerful attacker that has different strategies for each input length (key length or message size) and can more easily distinguish.
+
+\subsubsection*{Negligible Function}
+A function $\mu(n)$ is negligible if it decreases faster than the inverse of any polynomial.
+\begin{definition}
+    given a function $\mu : \Nat \to [0,1]$, we say $\mu$ is negligible if for all polynomials $p$, there exists $n_0 \in \Nat$ such that 
+$$
+    \forall \; n \geq n_0,\;   \; \mu(n) \leq \frac{1}{p(n)}
+$$
+\end{definition}
+Tests: are the following negligible?
+\begin{enumerate}
+    \item $\mu(n) = \frac{1}{n^2}$
+    \item $\mu(n) = \qquad \frac{1}{2^n}$ 
+    \item $\mu(n) = \frac{1}{n!}$ 
+    \item $\mu(n) = \qquad \frac{1}{2^{-n}}$ 
+    \item $\mu(n) = \frac{1}{2^{\log(n)}}$ 
+    \item $\mu(n) = \qquad \frac{1}{n^{\log(n)}}$ 
+\end{enumerate}
+
+Answer and Discussion
+\begin{enumerate}
+    \item $\frac{1}{n^k}$ is a inverse power function, aka polynomial time decreasing function. e.g. inverse cubic $1/n^3$, inverse quartic $1/n^4$, they approach 0 as $n$ approaches $\infty$. They are efficiently computable and tractable, though non-negligible. \\
+    \item $\mu(n) = \frac{1}{2^n}$ is an inverse exponential function and will always satsify the inequality because an exponential function will decrease faster than the inverse polynomial.  It's non-negligible and used in crypto\\
+    \item $\mu(n) = \frac{1}{n!}$ is an inverse factorial, defined only for non-negative, it's super exponential decreasing faster than exponential and isn't seen in computer science but maybe in poisson distribution. It's non-negligible but not used \\
+    \item $\mu(n) = \frac{1}{2^{-n}}$ without calculation, this is $2^n$ which is exponential growth rather than decay, definately not negligible. \\
+    \item $\frac{1}{2^{\log(n)}}$ is negligible but is sub-exponential, decreasing slower than $\frac{1}{2^n}$. For any $p(n)$ we show that a large enough $n$ satisifes our inequality. $\frac{1}{2^{\log(n)}} = \frac{1}{n^{\log(2)}}$, $n^{\log(2)}$ = $n^{0.693}$ therefore for sufficiently large n, this satifies the inequality. \\
+    \item $\frac{1}{n^{\log(n)}}$ decreases faster than the above
+\end{enumerate}
+log/exp rule: $x^{\log_a^{(y)}} = y^{\log_a^{(x)}}$
 
 \subsection*{Theory of Computation}
 \begin{itemize}
@@ -33,22 +70,18 @@
     \item This means, the function is bounded by the length of the input on the security parameter tape
 \end{itemize}
 
+
+
+\subsubsection*{Distinguishing Advantage}
+Quantifies $D$'s ability to distinguish between $X$ and $Y$ when given a sample from each $\Pr\[D(X(a,n)) = 1 \] - \Pr\[D(Y(a,n))=1\]$.
+The definition states this distinguishing advantage must be $\leq$ some negligible function $\mu(n)$ for suffiently large $n$. 
+
+\subsubsection*{Algorithm bounds}
+The definition of computational indistinguishability states the distinguishing advantage $\Pr\[D(X(a,n)) = 1 \] - \Pr\[D(Y(a,n))=1\]$ is bound by a negligible function which by definition 
+"Given unbounded computational power"
+"Brute force atttack"
+
 \section*{Computational Indistinguishability}
-$$
-X = \{X(a,n)\}_{a\in\zo^*; n \in \mathbb{N}}
-$$
-
-"A probability ensemble" is a collection or family of random variables, denoted by $X = \{X(a,n)\}$ i.e. $X$ represents the set of $\{X(a,n)\}$. 
-\begin{itemize}
-    \item Set $X = \{X(a,n)\}$ defines the set of random variables $X$
-    \item Set Subscript ${a\in\zo^*; n \in \mathbb{N}}$ defines the indexing, that is, exactly what values of $a, n$ can take for infinitely any element in set $X$. e.g. $X('01', 3)$ is the index of a random variable $X$ where $a$ is a binary string of any finite length "0, 1, 01, 000", $n$ is a natural number 1,2
-    \item $\zo^*$ is the Kleene star operation, means all finite strings, an infinite set because there's no limit to the length
-    \item $n\in\Nat$ means $n$ can be any natural number, also an infinite set
-    \item indexing gives us an address or a way to talk about 1 specific random variable rather than the collection
-    \item "probability ensemble" is a term in cryptography / probability theory referring to a collection or family of probability distributions or random variables. Used to describe systems where behaviours depend on on input length, security parameter, etc
-    \item "ensemble" means we're dealing with a collection of probabilistic objects rather than a single fixed distribution
-\end{itemize}
-
 Two probability ensembles, $X, Y$ are computationally indistinguishabile: $X \stackrel{c}{\equiv} Y$ if
 $$
 \abs{
@@ -56,26 +89,40 @@ $$
 } \leq \mu(n)
 $$
 
-The (absolute difference) of the probability that the distinguisher $D$ outputs 1 when given a sample from $X(a,n)$ and the probability $D$ outputs 1 when given a sample from $Y(a,n)$ is $\leq$ the negl. function $\mu(\cdot)$ 
-
-Notes:
 \begin{itemize}
+    \item $n$ is input length, the security parameter
+    \item $a$ is an auxillary input drawn from a binary string of any length, could be public parameters
+    \item ensembles $X, Y$ are computationally indistinguishable if no polynomial time algorithm $D$ can tell them apart with greater than negligible advantage.
     \item $D$ is a $\ppt$ algorithm trying to distinguish between samples from $X$ and $Y$, not guessing the bit
-    \item $D's$ output is binary $\zo$. Output 1 means "The sample came from $X$" or "This is a real sample" i.e. distinguish
-    \item We look at the difference in probability of $D$ outputting 1 for $X$ vs $Y$
-    \item a negl. difference means $D$ can't distinguish
-    \item absolute value || means we only want the magnitude of the difference, doesn't matter which is larger
-    \item $\mu(n)$ being a negl. function means the difference becomes smaller as the security parameter grows larger
-    \item All parties run in polynomial time in the security parameter means 
+    \item $D's$ output is binary $\zo$. Output 1 means a successful distinguish
+    \item We look at the absolute value difference in probability of $D$ outputting 1 for $X$ vs $Y$
 \end{itemize}
 
+$$
+X = \{X(a,n)\}_{a\in\zo^*; n \in \mathbb{N}}
+$$
+
+\begin{itemize}
+    \item Set $X = \{X(a,n)\}$ defines the set of random variables $X$
+    \item Subscript ${a\in\zo^*; n \in \mathbb{N}}$ defines the indexing, that is, exactly what values of $a, n$ can take for infinitely any element in set $X$. e.g. $X('01', 3)$ is the index of a random variable $X$ where $a$ is a binary string of any finite length "0, 1, 01, 000", $n$ is a natural number 1,2
+    \item $\zo^*$ is the Kleene star operation, means all finite strings, an infinite set because there's no limit to the length
+    \item $n\in\Nat$ means $n$ can be any natural number, also an infinite set
+    \item indexing gives us an address or a way to talk about 1 specific random variable rather than the collection
+    \item "probability ensemble" is a term in cryptography / probability theory referring to a collection or family of probability distributions or random variables. Used to describe systems where behaviours depend on on input length, security parameter, etc
+    \item "ensemble" means we're dealing with a collection of probabilistic objects rather than a single fixed distribution
+\end{itemize}
+
+
 \subsubsection*{Non-uniformity}
-"Above notion of computational indistinguishability is inherently non uniform: 
-"We allow D to be non-uniform": 
+\begin{itemize}
+    \item $D$ is defined above as non-uniform which increases its power to distinguish
+    \item Why it's important for computational Indistinguishability to be non-uniform? 
+\end{itemize}
 
 \subsubsection*{Order of quantifiers for computational indistinguishability}
 
 
 Questions
 - What are the tapes that are referred to?
-- How does the definition claim uniformity? Something to do with D Ding the random variabnles based on the indexed input
+- How does the definition claim uniformity? Something to do with D Di`ng the random variabnles based on the indexed input
+- what's the difference between leq negligible function and < 1/poly(n)?
