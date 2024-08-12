@@ -126,9 +126,61 @@ $$
 \end{itemize}
 
 \subsubsection*{Order of quantifiers for computational indistinguishability}
+\begin{itemize}
+    \item the main distinction this section is making is allowing $\mu$ the negligible function to depend on $a$, as in $\mu_a$ or $\mu(a,n)$ is very different to $\mu(\cdot)$ the prior definition of a neligible function. 
+    \item a negligible function that's parameterized by $a$ leads to a weaker security definition for computational complexity. 
+    \item The negligible probability of distinguishing doesn't vary on the specific problem instance $a$, only on the security parameter $n$.
+    \item a quantifier specifies the number of elements in a domain satisfy a given predicate. E.g. for all $\forall$, there exists $\exists$. This section identifies the fact that ordering changes the meaning of a statement.
+    \item "For all $a$, there exists a negligible function" is different to saying "there exists a negligible function for all $a$". The former says that every $a$ uses the same negligible function, the latter says that all $a$ have a negligible function but it could use different.
+    \item $X \stackrel{c}{\equiv} Y$ if for every non-uniform ppt algo $D$, there exists a negl. funcion $\mu(\cdot)$ for every $a\in\zo^*$ and every $n \in \mathbb{N}$ such that
+    $$
+    \{X(a,n)\}_{a\in\zo^*; n \in \mathbb{N}}  \stackrel{c}{\equiv} \{Y(a,n)\}_{a\in\zo^*; n \in \mathbb{N}}
+    $$
+    Is not the same as: for every $a\in\zo^*$ it holds that 
+    $$
+    \{X(a,n)\}_{n \in \mathbb{N}}  \stackrel{c}{\equiv} \{Y(a,n)\}_{n \in \mathbb{N}}
+    $$
+    \item For the piecewise function below, $|a|$ denotes the length of a bit string $a$. 
+    $$
+    \mu_a(n)=
+    \begin{cases}
+        1, & \text{if } n < 2^{|a|} \\
+        2^{-n}, & \text{if } n \geq 2^{|a|}
+    \end{cases}
+    $$\\
+    If the security parameter $n$ is less than the length of the bit string $a$ then the negligible function is not negligible. \\
+    If the security parameter $n$ is more than the length of the bit string $a$, the negligible function is exponential in $n$ and thus negligible.
+    \item $a$ can be the parameters of a crypto scheme, a public key, other instance specific information. Security should not rely on an instance of a problem, rather the security parameter.
+\end{itemize}
 
-
-Questions
-- What are the tapes that are referred to?
-- How does the definition claim uniformity? Something to do with D Di`ng the random variabnles based on the indexed input
-- what's the difference between leq negligible function and < 1/poly(n)?
+\subsubsection*{Semantic Security}
+\begin{itemize}
+    \item polynomial length plain texts = plaintext length is bounded by a polynomial function of the security parameter. Notice the maximum length of the plaintext depends on a polynomial function of the security parameter $\text{secparam}^3$ rather than $\text{secparam}^n$ \\
+    \lstset{language=Python, basicstyle=\ttfamily, frame=single}
+    \begin{lstlisting}
+    fn A(plaintext, secparam):
+        max_len = secparam^3
+        if len(plaintext) > max_len:
+            return plaintext[:max_len] //or return error
+        else:
+            return plaintext
+    \end{lstlisting}
+    \item Arbitrary distributions of plaintext: refers to any distribution of plaintexts, e.g. uniformly random such as encrypting output of a hash function or uuid, non-uniform such as encrypting names, ages, or email addresses where distribution is clustered around ranges or common names, or fixed distribution such as encryption of "YES" or "NO" type responses.
+    \item Aim of the adversary is to learn some function $f$ of the plaintext: \\
+    We model this scenario 
+    \lstset{language=Python, basicstyle=\ttfamily, frame=single}
+    \begin{lstlisting}
+    fn adversary_guess(ciphertext, auxillary_info, f):
+        
+        % advesary strategy to guess f(plaintext)
+        guess = secret_strategy(ciphertext, auxillary_info)
+        return guess
+    
+    fn evaluate_security(plaintext, ciphertext, auxillary_info, f):
+        actual_value = f(plain_text)
+        guess = adversary_guess(ciphertext, auxillary_info, f)
+        return guess == actual_value
+    \end{lstlisting}
+    The adversaries wins if their function $f$ learns anything about the ciphertext, such as the first bit, if a number is even or odd, the length of a string.
+    \item Auxillary Information: denoted as $h$ is additional information available to the adversary, like partial information of the ciphertext e.g. the language of the plaintext, or side-channel information.
+\end{itemize}
