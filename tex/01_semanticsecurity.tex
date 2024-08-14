@@ -1,0 +1,46 @@
+\subsubsection*{Information Theoretic (Perfect) Security }
+\begin{definition}
+a private-key encryption scheme is $(G,E,D)$ perfectly secure if for all $m_0, m_1 \in \cM$, $c \in \cC$, and uniformly random variable $k$ on $\cK$ if
+$$
+    k \gets(1^n) \; \Pr\[E_k(m_0) = c \] = \Pr\[E_k(m_1) = c \]
+$$
+\end{definition}
+
+Limitations
+\begin{itemize}
+    \item implies security against any adversary, even with unbounded computation
+    \item statement about the properties of the encryption scheme itself
+    \item k is the only random variable, an attacker gets no information about the message
+    \item doesn't model an adversary, assumes nothing is leaked at all!
+    \item What if $cA$ knew some information before? like the language of the ct, or if its a yes or no answer?
+\end{itemize}
+
+\subsubsection*{Semantic Security}
+\begin{definition}
+    A private-key encryption scheme $(G,E,D)$ is semantically secure (in the private key model) if for every non-uniform probabilistic polynomial time algorithm $\cA$ there exists a non-uniform probabilistic-polynomial time algorithm $\cA'$ such that for every probability ensemple $\{X_n\}_{n \in \Nat}$ with $\abs{X_n} \leq poly(n)$, every pair of polynomially-bounded functions $f, h: \zo^* \to \zo^*$ every positive polynomial $p(\cdot)$ and all sufficiently large $n$
+$$
+\blue{k \gets(1^n)} \; \Pr \[\mathcal{A}(1^n, \blue{E_k(X_n)},1^{\abs{X_n}}),h(1^n,X_n) = f(1^n,X_n)\]
+$$
+$$
+  < \Pr \[\mathcal{A}(1^n, \cancel{E_k(X_n)},1^{\abs{X_n}}),h(1^n,X_n) = f(1^n,X_n)\] \red{+ \frac{1}{p(n)}}
+$$
+\end{definition}
+
+\begin{itemize}
+    \item any information $\cA$ can compute about the plaintext $X_n$, $cA'$ can compute almost as well without the ciphertext. Except for a negligible advantage.
+    \item Here, $\cA$ is in the real world with access to the ciphertext and the simulator $\cA'$ doesn't.
+    \item Semantic Security holds if the 2 scenarios are computationally indistinguishable
+    \item If computational indistinguishability didn't hold, then $\cA$ would have a higher probability to guess
+\end{itemize}
+
+Limitations
+\begin{itemize}
+    \item assumes unlimited computational power
+    \item leads to impossibility results 
+\end{itemize}
+
+Moving to Semantic Security
+\begin{itemize}
+    \item assumes $\cA$ is bounded by probabilistic polynomial time algorithms
+    \item easily accounts for auxillary information
+\end{itemize}

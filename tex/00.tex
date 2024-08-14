@@ -71,6 +71,30 @@ Answer and Discussion
 \end{enumerate}
 log/exp rule: $x^{\log_a^{(y)}} = y^{\log_a^{(x)}}$
 
+\subsubsection*{Inequalities}
+Regularly, security of a crypto scheme is defined by something in the form of \\
+$$
+    \Pr\[\text{Algo}() = 1 \] \qquad \text{inequality / comparator} \qquad \Pr\[\text{Algo} = 1\] \qquad \text{some inequality} \; f
+$$
+I'll try to identify the differences in comparators and inequalities.\\
+First, the definition of computational indistinguishability:
+
+\begin{itemize}
+
+    \item First: Computational Indistinguishability
+$$
+    \abs{
+        \Pr\[D(X(a,n)) = 1 \] - \Pr\[D(Y(a,n))=1\]
+    } \leq \mu(n)
+$$
+    \item We look for the absolute value. We minus the first probability from the second and bound that to be at-most negligible. \\
+    \item let's analyse the impact of changing bounds:
+$$
+ a. \leq \mu(n) \qquad b. < \frac{1}{p(n)} \qquad c. \geq \frac{1}{p(n)}
+$$
+\item $a$ and $b$ are comparable since $\mu(n)$ is defined by the bound $\mu(n) < 1/p(n)$ if for positive polynomial $p(\cdot)$ and sufficiently large $n$ and that's why it uses $<$ rather than $\leq$
+\item 
+\end{itemize}
 
 
 
